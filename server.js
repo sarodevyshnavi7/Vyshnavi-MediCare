@@ -1,0 +1,18 @@
+require('dotenv').config();
+const express=require('express');
+const session=require('express-session');
+const path=require('path');
+const app=express();
+app.use(express.json());
+app.use(express.urlencoded({extended:true}));
+app.use(session({secret:process.env.SESSION_SECRET||'change-this-session-secret',resave:false,saveUninitialized:false,cookie:{httpOnly:true,sameSite:'lax',secure:false,maxAge:8*60*60*1000}}));
+app.use('/api/auth',require('./routes/authRoutes'));
+app.use('/api/medicines',require('./routes/medicineRoutes'));
+app.use('/api/orders',require('./routes/orderRoutes'));
+app.use('/api/users',require('./routes/userRoutes'));
+app.use('/api/admin',require('./routes/adminRoutes'));
+app.use(express.static(path.join(__dirname,'public')));
+app.get('/',(req,res)=>res.sendFile(path.join(__dirname,'public','index.html')));
+app.use((req,res)=>res.status(404).sendFile(path.join(__dirname,'public','404.html')));
+const PORT=process.env.PORT||3000;
+app.listen(PORT,()=>console.log(`Vyshnavi MediCare running at http://localhost:${PORT}`));
